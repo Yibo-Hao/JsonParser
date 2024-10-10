@@ -1,22 +1,33 @@
 //
 // Created by root on 10/8/24.
 
-#include <json_nodes.h>
+#include <json.h>
 #include <memory>
+#include <optional>
 
 
 int main() {
-    json::JsonNode jsonNode{};
-    std::shared_ptr<json::JsonNode> jsonNode1 = std::make_shared<json::JsonNode>();
-    std::shared_ptr<json::JsonNode> jsonNode2 = std::make_shared<json::JsonNode>();
+    std::string text = R"(
+{
+    "name": "John",
+    "age": 30,
+    "cars": [
+        {
+            "model": "BMW 230",
+            "mpg": 27.5
+        },
+        {
+            "model": "Ford Edge",
+            "mpg": 24.1
+        }
+    ]
+})";
 
-    // test print
-    jsonNode.setString("Hello"); 
-    jsonNode1->setNumber(3.14);
-    jsonNode2->setString("World");
-
-    jsonNode.setObject({{"key1", jsonNode1}, {"key2", jsonNode2}});
-    jsonNode.printf(std::cout);
-
+    json::Tokenizer tokenizer(text);
+    std::optional<json::Token> token = tokenizer.getToken();
+    while (token.has_value()) {
+        std::cout << token.value() << std::endl;
+        token = tokenizer.getToken();
+    }
     return 0;
 }

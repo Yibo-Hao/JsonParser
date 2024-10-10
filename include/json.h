@@ -5,4 +5,7 @@
 #ifndef JSON_PARSER_JSON_H
 #define JSON_PARSER_JSON_H
 
+#include <json_parser.h>
+#include <json_nodes.h>
+
 #endif //JSON_PARSER_JSON_H
