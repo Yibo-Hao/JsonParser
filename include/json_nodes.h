@@ -10,15 +10,75 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <iostream>
 
 namespace json {
     class JsonNode;
+
+    enum class type;
 
     using JsonObject = std::unordered_map<std::string, std::shared_ptr<JsonNode>>;
 
     using JsonArray = std::vector<std::shared_ptr<JsonNode>>;
 
     class JsonNode {
+    public:
+        JsonObject getObject() const {
+            return std::get<JsonObject>(value);
+        }
+
+        void setObject(JsonObject object) {
+            this->type = type::OBJECT;
+            value = std::move(object);
+        }
+
+        JsonArray getArray() const {
+            return std::get<JsonArray>(value);
+        }
+
+        void setArray(JsonArray array) {
+            this->type = type::ARRAY;
+            value = std::move(array);
+        }
+
+        std::string getString() const {
+            return std::get<std::string>(value);
+        }
+
+        void setString(std::string string) {
+            this->type = type::STRING;
+            value = std::move(string);
+        }
+
+        double getNumber() const {
+            return std::get<double>(value);
+        }
+
+        void setNumber(double number) {
+            this->type = type::NUMBER;
+            value = number;
+        }
+
+        bool getBoolean() const {
+            return std::get<bool>(value);
+        }
+
+        void setBoolean(bool boolean) {
+            this->type = type::BOOLEAN;
+            value = boolean;
+        }
+
+        std::nullptr_t getNull() const {
+            return std::get<std::nullptr_t>(value);
+        }
+
+        void setNull(std::nullptr_t null) {
+            this->type = type::NULL_VALUE;
+            value = null;
+        }
+
+        void printf(std::ostream &out = std::cout, int indent = 4) const;
+    private:
         enum class type {
             OBJECT, ARRAY, STRING, NUMBER, BOOLEAN, NULL_VALUE
         } type;
