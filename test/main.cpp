@@ -24,6 +24,6 @@ int main() {
 
     json::Parser parser(text);
     std::shared_ptr<json::JsonNode> node = parser.parse();
-    node->printf();
+    node->printf_no_space();
     return 0;
 }

@@ -78,6 +78,7 @@ namespace json {
         }
 
         void printf(std::ostream &out = std::cout, int indent = 0) const;
+        void printf_no_space(std::ostream &out = std::cout) const;
     private:
         enum class type {
             OBJECT, ARRAY, STRING, NUMBER, BOOLEAN, NULL_VALUE
