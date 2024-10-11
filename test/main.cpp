@@ -3,7 +3,6 @@
 
 #include <json.h>
 #include <memory>
-#include <optional>
 
 int main() {
     std::string text = R"(
