@@ -116,6 +116,10 @@ std::shared_ptr<JsonNode> Parser::parseObject() {
 
         if (token.type == Token::Type::STRING) {
             key = std::get<std::string> (token.value);
+        } else if (token.type == Token::Type::OBJECT_CLOSE) {
+            std::shared_ptr<JsonNode> node = std::make_shared<JsonNode>();
+            node->setObject(object);
+            return node;
         } else {
             throw std::invalid_argument("expected string as key");
         }

@@ -9,6 +9,10 @@ int main() {
 {
     "name": "John",
     "age": 30,
+    "married": true,
+    "children": null,
+    "houses": [],
+    "objects": {},
     "cars": [
         {
             "model": "BMW 230",
@@ -23,6 +27,6 @@ int main() {
 
     json::Parser parser(text);
     std::shared_ptr<json::JsonNode> node = parser.parse();
-    node->printf_no_space();
+    node->printf();
     return 0;
 }
