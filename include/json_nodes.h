@@ -77,7 +77,7 @@ namespace json {
             value = null;
         }
 
-        void printf(std::ostream &out = std::cout, int indent = 4) const;
+        void printf(std::ostream &out = std::cout, int indent = 0) const;
     private:
         enum class type {
             OBJECT, ARRAY, STRING, NUMBER, BOOLEAN, NULL_VALUE
