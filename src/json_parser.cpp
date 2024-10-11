@@ -6,7 +6,9 @@
 #include <string>
 #include <string_view>
 #include <stdexcept>
+#include <memory>
 
+#include <json_nodes.h>
 #include <json_parser.h>
 
 using namespace json;
@@ -74,6 +76,136 @@ std::optional<Token> Tokenizer::getToken() {
     }
 
     throw std::invalid_argument("unexpected character");
+}
+
+std::shared_ptr<JsonNode> Parser::parse() {
+    while(std::optional<Token> opt = tokenizer.getToken()) {
+        Token token = opt.value();
+        if (token.type == Token::Type::OBJECT_OPEN) {
+            return parseObject();
+        } else if (token.type == Token::Type::ARRAY_OPEN) {
+            return parseArray();
+        } else if (token.type == Token::Type::STRING) {
+            std::shared_ptr<JsonNode> node = std::make_shared<JsonNode>();
+            node->setString(std::get<std::string>(token.value));
+            return node;
+        } else if (token.type == Token::Type::NUMBER) {
+            std::shared_ptr<JsonNode> node = std::make_shared<JsonNode>();
+            node->setNumber(std::get<double>(token.value));
+            return node;
+        } else if (token.type == Token::Type::BOOLEAN) {
+            std::shared_ptr<JsonNode> node = std::make_shared<JsonNode>();
+            node->setBoolean(std::get<bool>(token.value));
+            return node;
+        } else if (token.type == Token::Type::NULL_VALUE) {
+            std::shared_ptr<JsonNode> node = std::make_shared<JsonNode>();
+            node->setNull(std::get<std::nullptr_t>(token.value));
+            return node;
+        } else {
+            throw std::invalid_argument("unexpected token");
+        }
+    }
+}
+
+std::shared_ptr<JsonNode> Parser::parseObject() {
+    JsonObject object;
+
+    while(std::optional<Token> opt = tokenizer.getToken()) {
+        Token token = opt.value();
+        std::string key;
+
+        if (token.type == Token::Type::STRING) {
+            key = std::get<std::string> (token.value);
+        } else {
+            throw std::invalid_argument("expected string as key");
+        }
+
+        std::optional<Token> colon = tokenizer.getToken();
+        if (not colon.has_value() or colon.value().type != Token::Type::COLON) {
+            throw std::invalid_argument("expected colon");
+        }
+
+        std::optional<Token> opt3 = tokenizer.getToken();
+        if (not opt3.has_value()) {
+            throw std::invalid_argument("unexpected end of input");
+        }
+        Token token3 = opt3.value();
+        if (token3.type == Token::Type::OBJECT_OPEN) {
+            object.emplace(key, parseObject());
+        } else if (token3.type == Token::Type::ARRAY_OPEN) {
+            object.emplace(key, parseArray());
+        } else if (token3.type == Token::Type::STRING) {
+            std::shared_ptr<JsonNode> node = std::make_shared<JsonNode>();
+            node->setString(std::get<std::string>(token3.value));
+            object.emplace(key, node);
+        } else if (token3.type == Token::Type::NUMBER) {
+            std::shared_ptr<JsonNode> node = std::make_shared<JsonNode>();
+            node->setBoolean(std::get<double>(token3.value));
+            object.emplace(key, node);
+        } else if (token3.type == Token::Type::BOOLEAN) {
+            std::shared_ptr<JsonNode> node = std::make_shared<JsonNode>();
+            node->setBoolean(std::get<bool>(token3.value));
+            object.emplace(key, node);
+        } else if (token3.type == Token::Type::NULL_VALUE) {
+            std::shared_ptr<JsonNode> node = std::make_shared<JsonNode>();
+            node->setNull(std::get<std::nullptr_t>(token3.value));
+            object.emplace(key, node);
+        } else {
+            throw std::invalid_argument("unexpected token");
+        }
+
+        std::optional<Token> opt4 = tokenizer.getToken();
+        if (not opt4.has_value()) {
+            throw std::invalid_argument("unexpected end of input");
+        }
+
+        Token token4 = opt4.value();
+        if (token4.type == Token::Type::OBJECT_CLOSE) {
+            std::shared_ptr<JsonNode> node = std::make_shared<JsonNode>();
+            node->setObject(object);
+            return node;
+        } else if (token4.type != Token::Type::COMMA) {
+            throw std::invalid_argument("expected comma");
+        }
+    }
+
+    return nullptr;
+}
+
+std::shared_ptr<JsonNode> Parser::parseArray() {
+    JsonArray array;
+
+    while(std::optional<Token> opt = tokenizer.getToken()) {
+        Token token = opt.value();
+
+        if (token.type == Token::Type::OBJECT_OPEN) {
+            array.push_back(parseObject());
+        } else if (token.type == Token::Type::ARRAY_OPEN) {
+            array.push_back(parseArray());
+        } else if (token.type == Token::Type::STRING) {
+            std::shared_ptr<JsonNode> node = std::make_shared<JsonNode>();
+            node->setString(std::get<std::string>(token.value));
+            array.push_back(node);
+        } else if (token.type == Token::Type::NUMBER) {
+            std::shared_ptr<JsonNode> node = std::make_shared<JsonNode>();
+            node->setNumber(std::get<double>(token.value));
+            array.push_back(node);
+        } else if (token.type == Token::Type::BOOLEAN) {
+            std::shared_ptr<JsonNode> node = std::make_shared<JsonNode>();
+            node->setBoolean(std::get<bool>(token.value));
+            array.push_back(node);
+        } else if (token.type == Token::Type::NULL_VALUE) {
+            std::shared_ptr<JsonNode> node = std::make_shared<JsonNode>();
+            node->setNull(std::get<std::nullptr_t>(token.value));
+            array.push_back(node);
+        } else if (token.type == Token::Type::ARRAY_CLOSE) {
+            std::shared_ptr<JsonNode> node = std::make_shared<JsonNode>();
+            node->setArray(array);
+            return node;
+        } else {
+            throw std::invalid_argument("unexpected token");
+        }
+    }
 }
 
 std::ostream &operator<<(std::ostream &out, const json::Token &token) {

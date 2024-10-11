@@ -10,6 +10,9 @@
 #include <string_view>
 #include <optional>
 #include <iostream>
+#include <memory>
+
+#include <json_nodes.h>
 
 namespace json {
     struct Token {
@@ -30,6 +33,19 @@ namespace json {
         std::string_view text;
 
         size_t pos = 0;
+    };
+
+    class Parser {
+    public:
+        Parser(std::string_view text) : tokenizer(text), text(text) {}
+
+        std::shared_ptr <JsonNode> parse();
+        std::shared_ptr <JsonNode> parseObject();
+        std::shared_ptr <JsonNode> parseArray();
+    private:
+        std::string_view text;
+
+        Tokenizer tokenizer;
     };
 };
 

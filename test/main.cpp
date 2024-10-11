@@ -23,11 +23,8 @@ int main() {
     ]
 })";
 
-    json::Tokenizer tokenizer(text);
-    std::optional<json::Token> token = tokenizer.getToken();
-    while (token.has_value()) {
-        std::cout << token.value() << std::endl;
-        token = tokenizer.getToken();
-    }
+    json::Parser parser(text);
+    std::shared_ptr<json::JsonNode> node = parser.parse();
+    // node->printf();
     return 0;
 }
