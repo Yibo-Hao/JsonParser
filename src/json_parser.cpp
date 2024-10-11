@@ -198,6 +198,8 @@ std::shared_ptr<JsonNode> Parser::parseArray() {
             std::shared_ptr<JsonNode> node = std::make_shared<JsonNode>();
             node->setNull(std::get<std::nullptr_t>(token.value));
             array.push_back(node);
+        } else if (token.type == Token::Type::COMMA) {
+            continue;
         } else if (token.type == Token::Type::ARRAY_CLOSE) {
             std::shared_ptr<JsonNode> node = std::make_shared<JsonNode>();
             node->setArray(array);

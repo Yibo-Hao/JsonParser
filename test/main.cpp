@@ -25,6 +25,6 @@ int main() {
 
     json::Parser parser(text);
     std::shared_ptr<json::JsonNode> node = parser.parse();
-    // node->printf();
+    node->printf();
     return 0;
 }
